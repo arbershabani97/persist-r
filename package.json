@@ -1,6 +1,6 @@
 {
   "name": "persist-r",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Filter transformator for redux-persist with pagination",
   "main": "dist/index.js",
   "scripts": {

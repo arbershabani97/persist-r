@@ -9,6 +9,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 exports.createFilter = createFilter;
 exports.createWhitelistFilter = createWhitelistFilter;
 exports.createBlacklistFilter = createBlacklistFilter;
+exports.persistCache = persistCache;
+exports.filterInitial = filterInitial;
 exports.persistFilter = persistFilter;
 
 var _reduxPersist = require('redux-persist');
@@ -45,16 +47,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function createFilter(reducerName, inboundPaths, outboundPaths) {
 	var transformType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'whitelist';
+	var firstPage = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
 	return (0, _reduxPersist.createTransform)(
 	// inbound
 	function (inboundState, key) {
-		return inboundPaths ? persistFilter(inboundState, inboundPaths, transformType) : inboundState;
+		return inboundPaths ? persistFilter(inboundState, inboundPaths, transformType, firstPage) : inboundState;
 	},
 
 	// outbound
 	function (outboundState, key) {
-		return outboundPaths ? persistFilter(outboundState, outboundPaths, transformType) : outboundState;
+		return outboundPaths ? persistFilter(outboundState, outboundPaths, transformType, firstPage) : outboundState;
 	}, { 'whitelist': [reducerName] });
 };
 
@@ -64,6 +67,13 @@ function createWhitelistFilter(reducerName, inboundPaths, outboundPaths) {
 
 function createBlacklistFilter(reducerName, inboundPaths, outboundPaths) {
 	return createFilter(reducerName, inboundPaths, outboundPaths, 'blacklist');
+}
+
+function persistCache(reducerName) {
+	var inboundPaths = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ["initial"];
+	var outboundPaths = arguments[2];
+
+	return createFilter(reducerName, inboundPaths, outboundPaths, "blacklist", true);
 }
 
 function filterObject(_ref, state) {
@@ -82,9 +92,31 @@ function filterObject(_ref, state) {
 	return (0, _lodash8.default)(value, filterFunction);
 }
 
+function filterInitial(state) {
+	var subset = {};
+	subset = (0, _lodash14.default)(state);
+
+	var list = {};
+	subset.show = [];
+	if (!subset.initial) subset.initial = [];
+
+	subset.initial.forEach(function (id) {
+		if (subset.list[id]) {
+			list[id] = subset.list[id];
+			subset.show.push(id);
+		}
+	});
+
+	subset.initial = subset.show;
+	subset.list = list;
+
+	return subset;
+}
+
 function persistFilter(state) {
 	var paths = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	var transformType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'whitelist';
+	var firstPage = arguments[3];
 
 	var subset = {};
 
@@ -92,6 +124,8 @@ function persistFilter(state) {
 	if (typeof paths === 'string') {
 		paths = [paths];
 	}
+
+	if (firstPage) return filterInitial(state);
 
 	if (transformType === 'whitelist') {
 		paths.forEach(function (path) {
