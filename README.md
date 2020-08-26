@@ -1,22 +1,25 @@
-# redux-persist-transform-filter
+# persist-r
 
-[![npm](https://img.shields.io/npm/v/redux-persist-transform-filter.svg?maxAge=2592000&style=flat-square)](https://www.npmjs.com/package/redux-persist-transform-filter)
-[![Build Status](https://travis-ci.org/edy/redux-persist-transform-filter.svg?branch=master)](https://travis-ci.org/edy/redux-persist-transform-filter)
+[![NPM](https://img.shields.io/npm/v/persist-r.svg)](https://www.npmjs.com/package/persist-r) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-Filter transformator for redux-persist
+> This package is based on edy/redux-persist-transform-filter, just caching persistence is added
+
+Filter transformator for redux-persist + persist caching
 
 ## Installation
 ```
-  npm install redux-persist-transform-filter
+  npm install persist-r
 ```
 
 ## Usage
 
 ```js
-import { createFilter, createBlacklistFilter } from 'redux-persist-transform-filter';
+import { createFilter, createBlacklistFilter, persistCache } from 'persist-r';
 
 // this works too:
-import createFilter, { createBlacklistFilter } from 'redux-persist-transform-filter';
+import createFilter, { createBlacklistFilter, persistCache } from 'persist-r';
+
+
 
 // you want to store only a subset of your state of reducer one
 const saveSubsetFilter = createFilter(
@@ -66,15 +69,7 @@ persistStore(store, {
     saveSubsetBlacklistFilter,
     loadSubsetFilter,
     saveAndloadSubsetFilter,
+    persistCache("projects")
   ]
 });
-```
-
-## Example project
-
-```sh
-git clone https://github.com/edy/redux-persist-transform-filter-example.git
-cd redux-persist-transform-filter-example
-npm install
-npm start
 ```

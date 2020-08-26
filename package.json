@@ -1,7 +1,7 @@
 {
-  "name": "redux-persist-transform-filter",
-  "version": "0.0.20",
-  "description": "Filter transformator for redux-persist",
+  "name": "persist-r",
+  "version": "1.0.0",
+  "description": "Filter transformator for redux-persist with pagination",
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha --require babel-register spec.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edy/redux-persist-transform-filter.git"
+    "url": "git+https://github.com/arbershabani97/persist-r.git"
   },
   "keywords": [
     "react",
@@ -20,11 +20,11 @@
     "transform",
     "filter"
   ],
-  "author": "Eduard Baun <eduard@baun.de>",
+  "author": "arbershabani97",
   "license": "MIT",
-  "homepage": "https://github.com/edy/redux-persist-transform-filter#readme",
+  "homepage": "https://github.com/arbershabani97/persist-r#readme",
   "bugs": {
-    "url": "https://github.com/edy/redux-persist-transform-filter/issues"
+    "url": "https://github.com/arbershabani97/persist-r/issues"
   },
   "dependencies": {
     "lodash.clonedeep": "^4.5.0",

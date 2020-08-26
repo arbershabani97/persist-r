@@ -7,19 +7,19 @@ import isEmpty from 'lodash.isempty';
 import forIn from 'lodash.forin';
 import cloneDeep from 'lodash.clonedeep';
 
-export function createFilter (reducerName, inboundPaths, outboundPaths, transformType = 'whitelist') {
+export function createFilter (reducerName, inboundPaths, outboundPaths, transformType = 'whitelist', firstPage = false) {
 	return createTransform(
 		// inbound
 		(inboundState, key) => {
 			return inboundPaths
-				? persistFilter(inboundState, inboundPaths, transformType)
+				? persistFilter(inboundState, inboundPaths, transformType, firstPage)
 				: inboundState;
 		},
 
 		// outbound
 		(outboundState, key) => {
 			return outboundPaths
-				? persistFilter(outboundState, outboundPaths, transformType)
+				? persistFilter(outboundState, outboundPaths, transformType, firstPage)
 				: outboundState;
 		},
 
@@ -35,6 +35,11 @@ export function createBlacklistFilter (reducerName, inboundPaths, outboundPaths)
 	return createFilter(reducerName, inboundPaths, outboundPaths, 'blacklist');
 }
 
+export function persistCache(reducerName, inboundPaths = ["initial"], outboundPaths) {
+	return createFilter(reducerName, inboundPaths, outboundPaths, "blacklist", true);
+}
+
+
 function filterObject({ path, filterFunction = () => true }, state) {
 	const value = get(state, path, state);
 
@@ -45,13 +50,36 @@ function filterObject({ path, filterFunction = () => true }, state) {
 	return pickBy(value, filterFunction);
 }
 
-export function persistFilter (state, paths = [], transformType = 'whitelist') {
+export function filterInitial(state) {
+	let subset = {};
+	subset = cloneDeep(state);
+
+	const list = {};
+	subset.show = [];
+	if (!subset.initial) subset.initial = [];
+
+	subset.initial.forEach((id) => {
+		if (subset.list[id]) {
+			list[id] = subset.list[id];
+			subset.show.push(id);
+		}
+	});
+
+	subset.initial = subset.show;
+	subset.list = list;
+
+	return subset;
+}
+
+export function persistFilter (state, paths = [], transformType = 'whitelist', firstPage) {
 	let subset = {};
 
 	// support only one key
 	if (typeof paths === 'string') {
 		paths = [paths];
 	}
+
+	if (firstPage) return filterInitial(state);
 
 	if (transformType === 'whitelist') {
 		paths.forEach((path) => {
