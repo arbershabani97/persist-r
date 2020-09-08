@@ -7,19 +7,19 @@ import isEmpty from 'lodash.isempty';
 import forIn from 'lodash.forin';
 import cloneDeep from 'lodash.clonedeep';
 
-export function createFilter (reducerName, inboundPaths, outboundPaths, transformType = 'whitelist', firstPage = false) {
+export function createFilter (reducerName, inboundPaths, outboundPaths, transformType = 'whitelist', firstPage = false, keys = false) {
 	return createTransform(
 		// inbound
 		(inboundState, key) => {
 			return inboundPaths
-				? persistFilter(inboundState, inboundPaths, transformType, firstPage)
+				? persistFilter(inboundState, inboundPaths, transformType, firstPage,keys)
 				: inboundState;
 		},
 
 		// outbound
 		(outboundState, key) => {
 			return outboundPaths
-				? persistFilter(outboundState, outboundPaths, transformType, firstPage)
+				? persistFilter(outboundState, outboundPaths, transformType, firstPage,keys)
 				: outboundState;
 		},
 
@@ -36,7 +36,8 @@ export function createBlacklistFilter (reducerName, inboundPaths, outboundPaths)
 }
 
 export function persistCache(reducerName, inboundPaths = ["initial"], outboundPaths) {
-	return createFilter(reducerName, inboundPaths, outboundPaths, "blacklist", true);
+	const reducer = reducerName.includes(".keys") ? reducerName.split(".")[0]: reducerName;
+	return createFilter(reducerName, inboundPaths, outboundPaths, "blacklist", true,reducerName.includes(".keys"));
 }
 
 
@@ -50,9 +51,28 @@ function filterObject({ path, filterFunction = () => true }, state) {
 	return pickBy(value, filterFunction);
 }
 
-export function filterInitial(state) {
+export function filterInitial(state,keys) {
 	let subset = {};
 	subset = cloneDeep(state);
+
+	if(keys) {
+		Object.keys(subset).forEach(key=> {
+			const list = {};
+			subset[key].show = [];
+			if (!subset[key].initial) subset[key].initial = [];
+
+			subset[key].initial.forEach((id) => {
+				if (subset[key].list[id]) {
+					list[id] = subset[key].list[id];
+					subset[key].show.push(id);
+				}
+			});
+
+			subset[key].initial = subset[key].show;
+			subset[key].list = list;
+		})
+		return subset;
+	}
 
 	const list = {};
 	subset.show = [];
@@ -71,7 +91,7 @@ export function filterInitial(state) {
 	return subset;
 }
 
-export function persistFilter (state, paths = [], transformType = 'whitelist', firstPage) {
+export function persistFilter (state, paths = [], transformType = 'whitelist', firstPage, keys) {
 	let subset = {};
 
 	// support only one key
@@ -79,7 +99,7 @@ export function persistFilter (state, paths = [], transformType = 'whitelist', f
 		paths = [paths];
 	}
 
-	if (firstPage) return filterInitial(state);
+	if (firstPage) return filterInitial(state, keys);
 
 	if (transformType === 'whitelist') {
 		paths.forEach((path) => {
