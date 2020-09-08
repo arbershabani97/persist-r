@@ -12,14 +12,14 @@ export function createFilter (reducerName, inboundPaths, outboundPaths, transfor
 		// inbound
 		(inboundState, key) => {
 			return inboundPaths
-				? persistFilter(inboundState, inboundPaths, transformType, firstPage,keys)
+				? persistFilter(inboundState, inboundPaths, transformType, firstPage, keys)
 				: inboundState;
 		},
 
 		// outbound
 		(outboundState, key) => {
 			return outboundPaths
-				? persistFilter(outboundState, outboundPaths, transformType, firstPage,keys)
+				? persistFilter(outboundState, outboundPaths, transformType, firstPage, keys)
 				: outboundState;
 		},
 
@@ -36,8 +36,8 @@ export function createBlacklistFilter (reducerName, inboundPaths, outboundPaths)
 }
 
 export function persistCache(reducerName, inboundPaths = ["initial"], outboundPaths) {
-	const reducer = reducerName.includes(".keys") ? reducerName.split(".")[0]: reducerName;
-	return createFilter(reducerName, inboundPaths, outboundPaths, "blacklist", true,reducerName.includes(".keys"));
+	const reducer = reducerName.includes(".keys") ? reducerName.split(".")[0] : reducerName;
+	return createFilter(reducer, inboundPaths, outboundPaths, "blacklist", true, reducerName.includes(".keys"));
 }
 
 
@@ -51,7 +51,7 @@ function filterObject({ path, filterFunction = () => true }, state) {
 	return pickBy(value, filterFunction);
 }
 
-export function filterInitial(state,keys) {
+export function filterInitial(state, keys) {
 	let subset = {};
 	subset = cloneDeep(state);
 
