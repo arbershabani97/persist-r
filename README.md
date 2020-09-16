@@ -2,7 +2,7 @@
 
 [![NPM](https://img.shields.io/npm/v/persist-r.svg)](https://www.npmjs.com/package/persist-r) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-> This package is based on edy/redux-persist-transform-filter, just caching persistence is added
+> This package is based on edy/redux-persist-transform-filter, just caching persistence is added -> `persistCache`
 
 Filter transformator for redux-persist + persist caching
 
@@ -69,7 +69,103 @@ persistStore(store, {
     saveSubsetBlacklistFilter,
     loadSubsetFilter,
     saveAndloadSubsetFilter,
-    persistCache("projects")
+    persistCache("projects"),
+    persistCache("tasks.keys")
   ]
 });
+```
+### Persist Cache
+
+#### Using `persistCache("projects")`
+``` javascript
+{
+  "projects": {
+    show:[1,2,3,4,5,6,7,8,9,10]
+    list:{
+      1: {id: 1, title: "hello"},
+      2: {id: 2, title: "hello"},
+      ...
+      10: {id: 10, title: "hello"},
+    },
+    initial: [1,2,4]
+  }
+}
+// convert it to the object down below, and save it in redux persist 
+// ...so only the elements from the `initial` are saved
+{
+  "projects": {
+    show:[1,2,4]
+    list:{
+      1: {id: 1, title: "hello"},
+      2: {id: 2, title: "hello"},
+      4: {id: 4, title: "hello"},
+    },
+    initial: [1,2,4]
+  }
+}
+```
+#### Using `persistCache("tasks.keys")`
+``` javascript
+// the case when we have project keys - 100, 101, 102
+{
+  "tasks": {
+    100: {
+      show:[1,2,3,4,5,6,7,8,9,10]
+      list:{
+        1: {id: 1, title: "hello"},
+        2: {id: 2, title: "hello"},
+        ...
+        10: {id: 10, title: "hello"},
+      },
+      initial: [1]
+    },
+    101: {
+      show:[1,2,3,4,5,6,7,8,9,10]
+      list:{
+        1: {id: 1, title: "hello"},
+        2: {id: 2, title: "hello"},
+        ...
+        10: {id: 10, title: "hello"},
+      },
+      initial: [1]
+    },
+    102: {
+      show:[1,2,3,4,5,6,7,8,9,10]
+      list:{
+        1: {id: 1, title: "hello"},
+        2: {id: 2, title: "hello"},
+        ...
+        10: {id: 10, title: "hello"},
+      },
+      initial: [1]
+    }
+  }
+}
+// convert it to the object down below, and save it in redux persist 
+// ...so only the elements from the `initial` are saved
+{
+  "tasks": {
+    100: {
+      show:[1]
+      list:{
+        1: {id: 1, title: "hello"},
+      },
+      initial: [1]
+    },
+    101: {
+      show:[1]
+      list:{
+        1: {id: 1, title: "hello"},
+      },
+      initial: [1]
+    },
+    102: {
+      show:[1]
+      list:{
+        1: {id: 1, title: "hello"},
+      },
+      initial: [1]
+    },
+  }
+}
 ```
